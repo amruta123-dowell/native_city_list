@@ -1,19 +1,24 @@
 package com.example.city_list
 
-import androidx.annotation.NonNull
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
+import java.util.Timer
 
 
 class MainActivity : FlutterActivity() {
-    private val channel = "com.example.city_list"
-    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
+    private val methodChannel = "com.example.city_list"
+    private val eventChannel = "com.example.city_list/events"
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channel).setMethodCallHandler {
+        //calling method channel
+     val methodChannel=  MethodChannel(flutterEngine.dartExecutor.binaryMessenger,
+         methodChannel)
+         methodChannel.setMethodCallHandler {
                 call, result ->
             if (call.method == "getDataFromNative") {
                 // Perform platform-specific operations and obtain the result
@@ -25,12 +30,22 @@ class MainActivity : FlutterActivity() {
                 result.notImplemented()
             }
         }
+//        calling event channel
+
+        val eventChannel = EventChannel(flutterEngine.dartExecutor.binaryMessenger,eventChannel)
+        eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
+            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                val data = getDataFromNative()
+                events?.success(data)
+
+            }
+
+            override fun onCancel(arguments: Any?) {
+
+            }
+        })
 
     }
-
-
-    // Set up the MethodChannel with the same name as defined in Dart
-
 
     private fun getDataFromNative(): List<Map<String, Any?>> {
 
@@ -149,3 +164,5 @@ class MainActivity : FlutterActivity() {
 
 
 }
+
+
