@@ -11,11 +11,15 @@ class HomeController extends GetxController {
   List<String> nativeMethods = [
     "Method Channel",
     "Event Channel",
-    "Platform Channel"
+    "Platform Event"
   ];
+
+  String? state;
+  int? selectedIndex = 0;
 
   ///call different channel based on index
   void onClickDifChannel(int index) {
+    selectedIndex = index;
     index == 1 ? callEventChannel() : callMethodChannel();
     Get.to(() => CityListScreen());
   }
@@ -39,10 +43,30 @@ class HomeController extends GetxController {
     });
   }
 
-  ///To change the city based on selected
-  void onSelectCity(String city) {
-    selectedCity = cities.firstWhereOrNull((element) => element.name == city);
+  onSelectCity(String city) async {
+    if (selectedIndex == 1) {
+      onSelectedCityFromEvent(city);
+      return;
+    }
+
+    //getSelectedData from method channel
+    var state = await methodPlatform
+        .invokeMethod("getDataFromNative", {"cityName": city});
+    Map<String, dynamic> convertMap =
+        Map<String, dynamic>.from(state.cast<String, dynamic>());
+    getSelectedData(convertMap);
     update();
+  }
+
+//getSelectedData from event channel
+  onSelectedCityFromEvent(String city) async {
+    eventPlatform.receiveBroadcastStream({"param1": city}).listen((event) {
+      Map<String, dynamic> convertMap =
+          Map<String, dynamic>.from(event.cast<String, dynamic>());
+      getSelectedData(convertMap);
+
+      update();
+    });
   }
 
   ///covert data into List<Map<String, dynamic>>
@@ -61,5 +85,13 @@ class HomeController extends GetxController {
     }
 
     update();
+  }
+
+  ///selected city
+  getSelectedData(Map<String, dynamic> selectedMapData) {
+    selectedCity = selectedCity = CityModel(
+        name: selectedMapData["name"],
+        id: selectedMapData["id"],
+        state: selectedMapData["state"]);
   }
 }

@@ -13,44 +13,10 @@ import java.util.Timer
 class MainActivity : FlutterActivity() {
     private val methodChannel = "com.example.city_list"
     private val eventChannel = "com.example.city_list/events"
-    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
-        GeneratedPluginRegistrant.registerWith(flutterEngine)
-        //calling method channel
-     val methodChannel=  MethodChannel(flutterEngine.dartExecutor.binaryMessenger,
-         methodChannel)
-         methodChannel.setMethodCallHandler {
-                call, result ->
-            if (call.method == "getDataFromNative") {
-                // Perform platform-specific operations and obtain the result
-                val data = getDataFromNative()
+//decode json
+    private val cities: List<CityModel> by lazy {
 
-                // Send the result back to Flutter
-                result.success(data)
-            } else {
-                result.notImplemented()
-            }
-        }
-//        calling event channel
-
-        val eventChannel = EventChannel(flutterEngine.dartExecutor.binaryMessenger,eventChannel)
-        eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
-            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-                val data = getDataFromNative()
-                events?.success(data)
-
-            }
-
-            override fun onCancel(arguments: Any?) {
-
-            }
-        })
-
-    }
-
-    private fun getDataFromNative(): List<Map<String, Any?>> {
-
-
-        val jsonData = """
+    val jsonData = """
         [
                {
         "id": "1",
@@ -144,24 +110,77 @@ class MainActivity : FlutterActivity() {
     }
          ]
     """.trimIndent()
-
-
-        val cities: List<CityModel>  = Gson().fromJson(jsonData, object : TypeToken<List<CityModel>>() {}.type)
-        // Convert CityModel list to List<Map<String, Any?>>
-        val cityMaps: List<Map<String, Any?>> = cities.map { city ->
+    Gson().fromJson(jsonData, object : TypeToken<List<CityModel>>() {}.type)
+}
+    // add decoded list of cities in variable
+    private val cityMap: List<Map<String, Any?>> by lazy {
+      cities.map { city ->
             mapOf(
                 "id" to city.id,
                 "name" to city.name,
                 "state" to city.state
             )
         }
+    }
 
-        println("cityMaps -----> $cityMaps")
-        return cityMaps
 
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        GeneratedPluginRegistrant.registerWith(flutterEngine)
+        //calling method channel
+     val methodChannel=  MethodChannel(flutterEngine.dartExecutor.binaryMessenger,
+         methodChannel)
+         methodChannel.setMethodCallHandler {
+                call, result ->
+            if (call.method == "getDataFromNative") {
+                val cityName = call.argument<String>("cityName")
+                if(cityName !=null){
+                    // selected city details
+                    val data = getCityDataFromNative(cityName)
+                    result.success(data)
+                }else{
+                    //get city list
+                    val data = getDataFromNative()
+                    result.success(data)
+                }
+
+
+                // Se the result back to Flutter
+
+            } else {
+                result.notImplemented()
+            }
+        }
+//        calling event channel
+
+        val eventChannel = EventChannel(flutterEngine.dartExecutor.binaryMessenger,eventChannel)
+        eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
+            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                val cityName = (arguments as? Map<*, *>)?.get("param1") as? String
+                if (!cityName.isNullOrEmpty()) {
+                    // Call the getCityDataFromNative function
+                    val selectedCityData = getCityDataFromNative(cityName)
+                    events?.success(selectedCityData)
+                }else{
+                    val data = getDataFromNative()
+                events?.success(data)
+                }
+
+            }
+            override fun onCancel(arguments: Any?) {
+            }
+        })
 
     }
 
+    private fun getDataFromNative(): List<Map<String, Any?>> {
+        println("cityMaps -----> $cityMap")
+        return cityMap
+    }
+
+    private fun getCityDataFromNative(cityName: String): Map<String,Any?> {
+        val selectedCity = getDataFromNative().firstOrNull { it["name"] == cityName }
+        return selectedCity ?: emptyMap()
+    }
 
 }
 
