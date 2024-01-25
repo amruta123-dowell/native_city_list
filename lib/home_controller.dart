@@ -1,5 +1,6 @@
 import 'package:city_list/city_model.dart';
 import 'package:city_list/ui/city_list_screen.dart';
+import 'package:city_list/ui/plat_form_view_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
@@ -20,6 +21,10 @@ class HomeController extends GetxController {
   ///call different channel based on index
   void onClickDifChannel(int index) {
     selectedIndex = index;
+    if (index == 2) {
+      Get.to(PlatformViewScreen());
+      return;
+    }
     index == 1 ? callEventChannel() : callMethodChannel();
     Get.to(() => CityListScreen());
   }

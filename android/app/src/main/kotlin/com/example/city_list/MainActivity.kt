@@ -1,5 +1,6 @@
 package com.example.city_list
 
+import androidx.annotation.NonNull
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.flutter.embedding.android.FlutterActivity
@@ -110,8 +111,10 @@ class MainActivity : FlutterActivity() {
     }
          ]
     """.trimIndent()
+
     Gson().fromJson(jsonData, object : TypeToken<List<CityModel>>() {}.type)
 }
+
     // add decoded list of cities in variable
     private val cityMap: List<Map<String, Any?>> by lazy {
       cities.map { city ->
@@ -126,8 +129,14 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine)
+        super.configureFlutterEngine(flutterEngine)
+        flutterEngine
+            .platformViewsController
+            .registry
+            .registerViewFactory("<platform-view-type>",
+                NativeViewFactory(cities))
         //calling method channel
-     val methodChannel=  MethodChannel(flutterEngine.dartExecutor.binaryMessenger,
+     val methodChannel =  MethodChannel(flutterEngine.dartExecutor.binaryMessenger,
          methodChannel)
          methodChannel.setMethodCallHandler {
                 call, result ->
@@ -183,5 +192,7 @@ class MainActivity : FlutterActivity() {
     }
 
 }
+
+
 
 
