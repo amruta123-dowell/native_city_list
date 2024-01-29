@@ -14,7 +14,7 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
-internal class NativeView(context: Context, cityList: List<CityModel>) : PlatformView {
+internal class NativeView(context: Context, cityList: List<CityModel>,   getCityDetailsHandler:GetStateListPlatformHandler) : PlatformView {
   private val recyclerView: RecyclerView
 
   override fun getView(): View {
@@ -30,7 +30,7 @@ internal class NativeView(context: Context, cityList: List<CityModel>) : Platfor
 
 
     // Create a com.example.city_list.CityAdapter and set it to the RecyclerView
-    val adapter = CityAdapter(cityList)
+    val adapter = CityAdapter(cityList, getCityDetailsHandler)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(context)
 

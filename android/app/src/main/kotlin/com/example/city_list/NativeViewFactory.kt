@@ -10,10 +10,10 @@ import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 
 
-class NativeViewFactory(private val cityList: List<CityModel>) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
+class NativeViewFactory(private val cityList: List<CityModel>, private  val getCityDetailsHandler:GetStateListPlatformHandler ) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
         val creationParams = args as Map<String?, Any?>?
-        return NativeView(context, cityList)
+        return NativeView(context, cityList, getCityDetailsHandler)
 //            getStateListHandler)
     }
 }

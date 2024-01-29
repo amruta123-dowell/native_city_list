@@ -60,8 +60,7 @@ class MainActivity : FlutterActivity() {
         "id": "8",
         "name": "Pune",
         "state": "Maharashtra"
-    },
-    {
+    }, {
         "id": "9",
         "name": "Jaipur",
         "state": "Rajasthan"
@@ -134,12 +133,12 @@ class MainActivity : FlutterActivity() {
         GeneratedPluginRegistrant.registerWith(flutterEngine)
         super.configureFlutterEngine(flutterEngine)
 
-        val nativeViewFactory = NativeViewFactory(cities)
+
         flutterEngine
             .platformViewsController
             .registry
             .registerViewFactory("<platform-view-type>",
-                NativeViewFactory(cities))
+                NativeViewFactory(cities,getStateListHandler ))
 //        flutterEngine
 //            .platformViewsController
 //            .registry
@@ -189,6 +188,13 @@ class MainActivity : FlutterActivity() {
             override fun onCancel(arguments: Any?) {
             }
         })
+        EventChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            platformViewEvent
+        ).setStreamHandler(
+            this.getStateListHandler
+        )
+
 
     }
 
@@ -220,8 +226,8 @@ class GetStateListPlatformHandler : EventChannel.StreamHandler {
         eventSink = null
     }
 
-    fun sendEvent(tempStateName: String) {
-        eventSink?.success(tempStateName)
+    fun sendEvent(cityDetails: String) {
+        eventSink?.success(cityDetails)
     }
 }
 

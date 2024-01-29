@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 
-class CityAdapter(private val cityList: List<CityModel>) :
+class CityAdapter(private val cityList: List<CityModel>,  val getCityDetailsHandler:GetStateListPlatformHandler) :
     RecyclerView.Adapter<CityAdapter.CityViewHolder>() {
 
     class CityViewHolder( context: Context) : RecyclerView.ViewHolder(FrameLayout(context)) {
@@ -65,8 +65,8 @@ class CityAdapter(private val cityList: List<CityModel>) :
 
     private fun onItemClick(position: Int) {
         println("position---> $position")
-        val selectedDetails = cityList[position].state
-
+      val selectedDetails =  cityList[position].state
+    getCityDetailsHandler.sendEvent(selectedDetails)
 
 //      val  itemDetails =
 //          mapOf("name" to cityList[position].name, "id" to  cityList[position].id,
