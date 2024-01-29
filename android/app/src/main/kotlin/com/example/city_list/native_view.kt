@@ -10,6 +10,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
 internal class NativeView(context: Context, cityList: List<CityModel>) : PlatformView {

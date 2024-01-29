@@ -1,19 +1,21 @@
 package com.example.city_list
 
-import androidx.annotation.NonNull
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
+
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
-import java.util.Timer
 
 
 class MainActivity : FlutterActivity() {
     private val methodChannel = "com.example.city_list"
     private val eventChannel = "com.example.city_list/events"
+    private val platformViewChannel = "com.example.city_list/platformViewChannel";
+    private val platformViewEvent = "getCityDetailsFromPlatformView";
+    private val getStateListHandler = GetStateListPlatformHandler()
 //decode json
     private val cities: List<CityModel> by lazy {
 
@@ -128,14 +130,22 @@ class MainActivity : FlutterActivity() {
 
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        // Register other plugins and views
         GeneratedPluginRegistrant.registerWith(flutterEngine)
         super.configureFlutterEngine(flutterEngine)
+
+        val nativeViewFactory = NativeViewFactory(cities)
         flutterEngine
             .platformViewsController
             .registry
             .registerViewFactory("<platform-view-type>",
                 NativeViewFactory(cities))
-        //calling method channel
+//        flutterEngine
+//            .platformViewsController
+//            .registry
+//            .registerViewFactory("<platform-view-type>", nativeViewFactory)
+
+
      val methodChannel =  MethodChannel(flutterEngine.dartExecutor.binaryMessenger,
          methodChannel)
          methodChannel.setMethodCallHandler {
@@ -172,6 +182,7 @@ class MainActivity : FlutterActivity() {
                 }else{
                     val data = getDataFromNative()
                 events?.success(data)
+
                 }
 
             }
@@ -194,5 +205,24 @@ class MainActivity : FlutterActivity() {
 }
 
 
+
+
+class GetStateListPlatformHandler : EventChannel.StreamHandler {
+
+    // Declare our eventSink later it will be initialized
+    private var eventSink: EventChannel.EventSink? = null
+
+    override fun onListen(p0: Any?, sink: EventChannel.EventSink) {
+        eventSink = sink
+    }
+
+    override fun onCancel(p0: Any?) {
+        eventSink = null
+    }
+
+    fun sendEvent(tempStateName: String) {
+        eventSink?.success(tempStateName)
+    }
+}
 
 
