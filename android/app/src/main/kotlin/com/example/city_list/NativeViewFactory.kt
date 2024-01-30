@@ -14,7 +14,7 @@ class NativeViewFactory(private val cityList: List<CityModel>, private  val getC
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
         val creationParams = args as Map<String?, Any?>?
         return NativeView(context, cityList, getCityDetailsHandler)
-//            getStateListHandler)
+
     }
 }
 

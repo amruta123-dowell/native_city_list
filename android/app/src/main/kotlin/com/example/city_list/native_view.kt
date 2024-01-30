@@ -2,6 +2,7 @@ package com.example.city_list//package com.example.city_list
 
 
 import android.content.Context
+import android.view.LayoutInflater
 
 
 import android.view.View
@@ -15,26 +16,40 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
 internal class NativeView(context: Context, cityList: List<CityModel>,   getCityDetailsHandler:GetStateListPlatformHandler) : PlatformView {
-  private val recyclerView: RecyclerView
+  private val rootView: View
+
 
   override fun getView(): View {
-    return recyclerView
+    return rootView
   }
 
   override fun dispose() {}
 
   init {
-    recyclerView = RecyclerView(
-      context
-    )
+    // Inflate the activity_main.xml layout
+    rootView = LayoutInflater.from(context).inflate(R.layout.activity_main, null)
 
+    // Get the RecyclerView from the inflated layout
+    val recyclerView = rootView.findViewById<RecyclerView>(R.id.recyclerView)
 
-    // Create a com.example.city_list.CityAdapter and set it to the RecyclerView
+    // Create a CityAdapter and set it to the RecyclerView
     val adapter = CityAdapter(cityList, getCityDetailsHandler)
     recyclerView.adapter = adapter
     recyclerView.layoutManager = LinearLayoutManager(context)
-
   }
+
+//  init {
+//    recyclerView = RecyclerView(
+//      context
+//    )
+//
+//
+//    // Create a com.example.city_list.CityAdapter and set it to the RecyclerView
+//    val adapter = CityAdapter(cityList, getCityDetailsHandler)
+//    recyclerView.adapter = adapter
+//    recyclerView.layoutManager = LinearLayoutManager(context)
+//
+//  }
 }
 
 

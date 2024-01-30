@@ -2,6 +2,8 @@ package com.example.city_list
 
 import android.content.Context
 import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
@@ -10,55 +12,27 @@ import androidx.recyclerview.widget.RecyclerView
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 
-class CityAdapter(private val cityList: List<CityModel>,  val getCityDetailsHandler:GetStateListPlatformHandler) :
+class CityAdapter(private val cityList: List<CityModel>, private val getCityDetailsHandler:GetStateListPlatformHandler) :
     RecyclerView.Adapter<CityAdapter.CityViewHolder>() {
 
-    class CityViewHolder( context: Context) : RecyclerView.ViewHolder(FrameLayout(context)) {
-        val cityNameTextView: TextView = TextView(context)
-        val cityButton: Button = Button(context)
-
-        init {
-            // Set up the layout parameters for FrameLayout
-            val layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT
-            )
-            itemView.layoutParams = layoutParams
-
-            // Set up the layout parameters for TextView
-            cityNameTextView.textSize = 18f
-            val textLayoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT
-            )
-            cityNameTextView.layoutParams = textLayoutParams
-
-            // Set up the layout parameters for Button
-            val buttonLayoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT
-            )
-            buttonLayoutParams.gravity = Gravity.END
-            cityButton.layoutParams = buttonLayoutParams
-
-            // Add TextView and Button to the FrameLayout
-            (itemView as FrameLayout).addView(cityNameTextView)
-            (itemView as FrameLayout).addView(cityButton)
-        }
+    class CityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val textViewItem: TextView = itemView.findViewById(R.id.textViewItem)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CityViewHolder {
-        return CityViewHolder(parent.context)
+        // Inflate the item_button.xml layout for each item
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_button, parent, false)
+        return CityViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: CityViewHolder, position: Int) {
         val cityName = cityList[position]
 
         // Set data to TextView
-        holder.cityNameTextView.text = cityName.name
+        holder.textViewItem.text = cityName.name
 
         // Set up the button click listener
-        holder.cityButton.setOnClickListener {
+        holder.itemView.setOnClickListener {
             onItemClick(position)
         }
     }
@@ -67,12 +41,6 @@ class CityAdapter(private val cityList: List<CityModel>,  val getCityDetailsHand
         println("position---> $position")
       val selectedDetails =  cityList[position].state
     getCityDetailsHandler.sendEvent(selectedDetails)
-
-//      val  itemDetails =
-//          mapOf("name" to cityList[position].name, "id" to  cityList[position].id,
-//                     "state" to cityList[position].state)
-
-
 
     }
 
