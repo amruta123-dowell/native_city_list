@@ -1,0 +1,29 @@
+PODS:
+  - Fakery (5.1.0)
+  - Flutter (1.0.0)
+  - sample_communication (0.0.1):
+    - Fakery
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - sample_communication (from `.symlinks/plugins/sample_communication/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Fakery
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  sample_communication:
+    :path: ".symlinks/plugins/sample_communication/ios"
+
+SPEC CHECKSUMS:
+  Fakery: a90caff00ca5cacde6c161c3eafc72314a03d34d
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  sample_communication: 18bee595781e1362809809dd868dfc5532a8b4a9
+
+PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
+
+COCOAPODS: 1.15.0
