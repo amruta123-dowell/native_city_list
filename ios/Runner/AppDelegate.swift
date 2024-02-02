@@ -54,14 +54,15 @@ let jsonString = """
         let methodChannel = FlutterMethodChannel(name: methodChannelName,
                                                  binaryMessenger: controller.binaryMessenger)
         let eventChannel = FlutterEventChannel(name: eventChannelName, binaryMessenger: controller.binaryMessenger)
-        prepareMethodHandler(methodChannel: methodChannel)
-//        eventChannel.setStreamHandler(StreamHandler())
-        GeneratedPluginRegistrant.register(with: self)
-//        GeneratedPluginRegistrant.register(withRegistry:self)
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
         
+        prepareMethodHandler(methodChannel: methodChannel)
+        eventChannel.setStreamHandler(StreamHandler())
+        GeneratedPluginRegistrant.register(with: self)
+//GeneratedPluginRegistrant.register(withRegistry:self)
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
-    //calling method channel event
+    
+//calling method channel event
     private func prepareMethodHandler(methodChannel: FlutterMethodChannel) {
                methodChannel.setMethodCallHandler({
             (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
@@ -76,13 +77,6 @@ let jsonString = """
             
         })
     }
-    
-//    class StreamHandler:NSObject, FlutterStreamHandler{
-//        func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-//            receiveCities(
-//
-//        }
-//    }
  
 
     private func receiveCities(result: FlutterResult, selectedCity: String?) {
@@ -107,4 +101,62 @@ let jsonString = """
       }
     
     
+}
+//calling event channnel
+class StreamHandler:NSObject, FlutterStreamHandler {
+    static var eventSink: FlutterEventSink?
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        
+        let jsonString = """
+        [
+            {
+                "id": "1",
+                "name": "Mumbai",
+                "state": "Maharashtra"
+            },
+            {
+                "id": "2",
+                "name": "Delhi",
+                "state": "Delhi"
+            },
+            {
+                "id": "3",
+                "name": "Bengaluru",
+                "state": "Karnataka"
+            }]
+        """
+        var cityList:[CityModel] = [];
+        StreamHandler.eventSink = events
+        if let jsonData = jsonString.data(using: .utf8){
+            do{
+                let cityData = try JSONDecoder().decode([CityModel].self, from: jsonData)
+                cityList = cityData
+                print("decoded cityList --------> \(cityList)")
+            }catch{
+                print("Error decoding JSON -------------> \(error)")
+            }
+        }
+        let cityDictionaries: [[String: Any]] = cityList.map { city in
+               return [
+                   "id": city.id,
+                   "name": city.name,
+                   "state": city.state
+               ]
+           }
+        let selectedCity = arguments as? String
+        if let selectedCityDetails = cityDictionaries.first(where: { $0["name"] as? String == selectedCity }) {
+            // Send details of the selected city
+            events(selectedCityDetails)
+            return nil;
+        }else{
+            events(cityDictionaries)
+            return nil
+        }
+            
+        }
+
+        func onCancel(withArguments arguments: Any?) -> FlutterError? {
+            StreamHandler.eventSink = nil
+            return nil
+        }
 }

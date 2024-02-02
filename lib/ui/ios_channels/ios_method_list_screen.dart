@@ -10,10 +10,19 @@ class IOSMethodScreen extends GetView<IOSChannelController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          title: Text(controller.selectedButtonIndex == 0
+              ? "Method event screen"
+              : "Channel event screen"),
+          backgroundColor:
+              controller.selectedButtonIndex == 0 ? Colors.red : Colors.green),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(
+            height: 30,
+          ),
           ListView.builder(
               shrinkWrap: true,
               itemCount: controller.cities.length,
@@ -28,7 +37,10 @@ class IOSMethodScreen extends GetView<IOSChannelController> {
                     height: 60,
                     margin: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 10),
-                    decoration: const BoxDecoration(color: Colors.red),
+                    decoration: BoxDecoration(
+                        color: controller.selectedButtonIndex == 0
+                            ? Colors.red
+                            : Colors.green),
                     child: Text(controller.cities[index].name),
                   ),
                 );

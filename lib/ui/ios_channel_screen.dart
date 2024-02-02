@@ -34,12 +34,7 @@ class IOSChannelScreen extends GetView<IOSChannelController> {
           for (int i = 0; i < 3; i++) ...[
             InkWell(
                 onTap: () {
-                  if (i == 0) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => IOSMethodScreen()));
-                  }
+                  controller.onClickChannelButton(i);
                 },
                 child: ButtonTileWidget(text: controller.iosChannelTypes[i]))
           ],
